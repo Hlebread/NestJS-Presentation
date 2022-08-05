@@ -16,12 +16,412 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+        <section data-background-image="/assets/nest_logo.webp"></section>
+
+
+
+        <section>
+          <section data-background-image="/assets/nodejs_logo.png"></section>
+          <section>
+            <h1>API платформы</h1>
+            <ul>
+              <li>http</li>
+              <li>url</li>
+              <li>querystring</li>
+              <li>path</li>
+              <li>fs</li>
+            </ul>
+          </section>
+        </section>
+
+
+
+        <section>
+          <section data-background-image="/assets/state_of_js_satisfaction.png"></section>
+          <section data-background-image="/assets/state_of_js_interest.png"></section>
+          <section data-background-image="/assets/state_of_js_usage.png"></section>
+          <section>
+            <h1>2019</h1>
+            <img src="/assets/risingstarts_2019.png" alt="">
+          </section>
+          <section>
+            <h1>2020</h1>
+            <img src="/assets/risingstarts_2020.png" alt="">
+          </section>
+          <section>
+            <h1>2021</h1>
+            <img src="/assets/risingstarts_2021.png" alt="">
+          </section>
+        </section>
+
+
+
+        <section>
+          <section data-background-image="/assets/express_logo.png"></section>
+          <section>
+            <h3>Плюсы:</h1>
+            <ul>
+              <li class="fragment">Гибкость</li>
+              <li class="fragment">Предлагает надежный механизм маршрутизации для обработки динамических URL-адресов</li>
+              <li class="fragment">Обеспечивает более быструю разработку в сравнении c Node.js.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Минусы:</h1>
+            <ul>
+              <li>Гибкость</li>
+              <li>ECMAScript</li>
+              <li>Сложность поддержки крупных приложений</li>
+            </ul>
+          </section>
+        </section>
+
+
+
+        <section>
+          <section data-background-image="/assets/nest_title_page.png"></section>
+          <section>
+            <ul>
+              <li class="fragment">CLI</li>
+              <li class="fragment">Typescript</li>
+              <li class="fragment">Платформенно-независим</li>
+              <li class="fragment">Поддерживает любые протоколы</li>
+              <li class="fragment">Архитектура "из коробки"</li>
+              <li class="fragment">Тестирование</li>
+            </ul>
+          </section>
+          <section>
+            <ul>
+              <li class="fragment">Большое количество библиотек</li>
+              <li class="fragment">Интеграция c популярными ORM (TypeORM, Sequelize, Prisma, Mongoose)</li>
+              <li class="fragment">Передовые концепции (DDD, Event sourcing, микросервисы)</li>
+              <li class="fragment">Декораторы</li>
+              <li class="fragment">Обработка ошибок "из коробки"</li>
+            </ul>
+          </section>
+        </section>
+
+
+
+        <section>
+          <section>
+            <h1>Из чего же состоит <span style="color:#EB2744">NestJS</span>?
+            </h1>
+            <img src="/assets/witch.gif" alt="">
+          </section>
+          <section>
+            <h3 style="color:#EB2744">NestJS</h3>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0|1-2|4-7|9">import { NestFactory } from '@nestjs/core';
+import { ApplicationModule } from './modules/app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(ApplicationModule);
+  await app.listen(3000);
+}
+
+bootstrap();
+                </code>
+              </pre>
+          </section>
+          <section>
+            <h3>Express</h3>
+            <pre class="stretch">
+              <code class="hljs javascript">import * as express from 'express';
+
+const app = express();
+
+app.get('/', (request, response) => {
+  response.send('Hello world!');
+});
+
+app.listen(5000);
+                </code>
+              </pre>
+          </section>
+          <section>
+            <h3>Express</h3>
+            <pre class="stretch">
+              <code class="hljs javascript">import * as express from 'express';
+import * as bodyParser from 'body-parser';
+
+class App {
+  public app: express.Application;
+  public port: number;
+
+  constructor(controllers, port) {
+    this.app = express();
+    this.port = port;
+
+    this.initializeMiddlewares();
+    this.initializeControllers(controllers);
+  }
+
+  private initializeMiddlewares() {
+    this.app.use(bodyParser.json());
+  }
+
+  private initializeControllers(controllers) {
+    controllers.forEach((controller) => {
+      this.app.use('/', controller.router);
+    });
+  }
+
+  public listen() {
+    this.app.listen(this.port, () => {
+      console.log(`App listening on the port ${this.port}`);
+    });
+  }
+}
+
+export default App;
+                </code>
+              </pre>
+          </section>
+          <section>
+            <ul>
+              <li>Modules</li>
+              <li>Controllers</li>
+              <li>Providers</li>
+              <li>Middlewares</li>
+              <li>ExceptionFilters</li>
+              <li>Pipes</li>
+              <li>Guards</li>
+              <li>Interceptors</li>
+              <li>Custom route decorators</li>
+            </ul>
+          </section>
+          <section>
+            <pre>
+              <code>
+                src/users
+                  |
+                  |- users.controller.ts
+                  |- users.module.ts
+                  |- users.service.ts
+              </code>
+            </pre>
+          </section>
+        </section>
+
+
+
+        <section>
+          <section>
+            <h1>Modules</h1>
+          </section>
+          <section>
+            <img src="/assets/nest_module.png" height="100%" width="100%">
+          </section>
+          <section>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0|1|4-9|6|7|8|10">import { Module } from '@nestjs/common';
+import { UserController } from './user.controller';
+import { UserService } from './user.service';
+
+@Module({
+  controllers: [UserController],
+  providers: [UserService],
+  exports: [UserService],
+})
+export class UserModule {}
+              </code>
+            </pre>
+          </section>
+        </section>
+
+
+
+        <section>
+          <section>
+            <h1>Controllers</h1>
+          </section>
+          <section style="font-size: 24px;">
+            <h1 style="color:#EB2744">NestJS</h1>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0|1|6|8-10|12,17,22,27,32|18|23">import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import PostsService from './posts.service';
+import CreatePostDto from './dto/createPost.dto';
+import UpdatePostDto from './dto/updatePost.dto';
+
+@Controller('posts') // Может вызываться без аргумента
+export default class PostsController {
+  constructor(
+    private readonly postsService: PostsService
+  ) {}
+
+  @Get()
+  getAllPosts() {
+    return this.postsService.getAllPosts();
+  }
+
+  @Get(':id')
+  getPostById(@Param('id') id: string) {
+    return this.postsService.getPostById(Number(id));
+  }
+
+  @Post()
+  async createPost(@Body() post: CreatePostDto) {
+    return this.postsService.createPost(post);
+  }
+
+  @Put(':id')
+  async replacePost(@Param('id') id: string, @Body() post: UpdatePostDto) {
+    return this.postsService.replacePost(Number(id), post);
+  }
+
+  @Delete(':id')
+  async deletePost(@Param('id') id: string) {
+    this.postsService.deletePost(Number(id));
+  }
+}
+              </code>
+            </pre>
+          </section>
+          <section style="font-size: 24px;">
+            <h1>Express</h1>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0|2,7|8-10|12-14,16-20|23-25,28-32,34-38,40-45,47-51">import { Request, Response, Router } from 'express';
+import Controller from '../../interfaces/controller.interface';
+import PostsService from './posts.service';
+import CreatePostDto from './dto/createPost.dto';
+import UpdatePostDto from './dto/updatePost.dto';
+
+export default class PostsController implements Controller {
+  private path = '/posts';
+  public router = Router();
+  private postsService = new PostsService();
+
+  constructor() {
+    this.intializeRoutes();
+  }
+
+  intializeRoutes() {
+    this.router.get(this.path, this.getAllPosts);
+    this.router.get(`${this.path}/:id`, this.getPostById);
+    this.router.post(this.path, this.createPost);
+    this.router.put(`${this.path}/:id`, this.replacePost);
+  }
+
+  private getAllPosts = (request: Request, response: Response) => {
+    const posts = this.postsService.getAllPosts();
+    response.send(posts);
+  }
+
+  private getPostById = (request: Request, response: Response) => {
+    const id = request.params.id;
+    const post = this.postsService.getPostById(Number(id));
+    response.send(post);
+  }
+
+  private createPost = (request: Request, response: Response) => {
+    const post: CreatePostDto = request.body;
+    const createdPost = this.postsService.createPost(post);
+    response.send(createdPost);
+  }
+
+  private replacePost = (request: Request, response: Response) => {
+    const id = request.params.id;
+    const post: UpdatePostDto = request.body;
+    const replacedPost = this.postsService.replacePost(Number(id), post);
+    response.send(replacedPost);
+  }
+
+  private deletePost = (request: Request, response: Response) => {
+    const id = request.params.id;
+    this.postsService.deletePost(Number(id));
+    response.sendStatus(200);
+  }
+}
+              </code>
+            </pre>
+          </section>
+          <section>
+            <h2>Decorators</h2>
+            <ul>
+              <li>@Request(), @Req()</li>
+              <li>@Response(), @Res()</li>
+              <li>@Session()</li>
+              <li>@Param(param?: string)</li>
+              <li>@Body(param?: string)</li>
+              <li>@Query(param?: string)</li>
+              <li>@Headers(param?: string)</li>
+              <li>@Ip()</li>
+            </ul>
+          </section>
+        </section>
+
+
+
+        <section>
+          <section><h1>Providers</h1></section>
+          <section style="font-size: 24px;">
+            <h1>Service</h1>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0|7,9-12|14-20,22-26">import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import User from './user.entity';
+import CreateUserDto from './dto/createUser.dto';
+
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository
+  ) {}
+
+  async getByEmail(email: string) {
+    const user = await this.usersRepository.findOne({ email });
+    if (user) {
+      return user;
+    }
+    throw new HttpException('User with this email does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async create(userData: CreateUserDto) {
+    const newUser = await this.usersRepository.create(userData);
+    await this.usersRepository.save(newUser);
+    return newUser;
+  }
+}
+              </code>
+            </pre>
+          </section>
+          <section style="font-size: 24px;">
+            <h1>Config Service</h1>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0|7,9-12|14-20,22-26">import { ConfigService, Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AppConfigService {
+  constructor(private configService: ConfigService) {}
+
+  get DB_HOST(): string {
+    return this.configService.get('DATABASE_HOST')
+  }
+
+  get DB_PORT(): string {
+    return this.configService.get('DATABASE_PORT')
+  }
+
+  get DB_NAME(): string {
+    return this.configService.get('DATABASE_NAME')
+  }
+
+  get DB_MONGO(): string {
+    return `mongodb://${this.DB_HOST}:${this.DB_PORT}/${this.DB_NAME}`
+  }
+}
+              </code>
+            </pre>
+          </section>
+        </section>
 			</div>
 		</div>
 
 		<script src="dist/reveal.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
 		<script src="plugin/notes/notes.js"></script>
 		<script src="plugin/markdown/markdown.js"></script>
 		<script src="plugin/highlight/highlight.js"></script>
@@ -33,7 +433,7 @@
 				hash: true,
 
 				// Learn about plugins: https://revealjs.com/plugins/
-				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+				plugins: [RevealZoom, RevealMarkdown, RevealHighlight, RevealNotes ]
 			});
 		</script>
 	</body>
