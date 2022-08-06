@@ -385,6 +385,28 @@ export class CreatePostDto {
               <li class="fragment highlight-current-green" data-fragment-index="2">@Ip()</li>
             </ul>
           </section>
+          <section>
+            <h5>Custom request decorator</h5>
+            <pre>
+              <code class="hljs javascript">import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+
+export const Cookies = createParamDecorator(
+  (data: string, context: ExecutionContext) => {
+    const request = context.switchToHttp().getRequest();
+
+    return data ? request.cookies?.[data] : request.cookies;
+  },
+);
+              </code>
+            </pre>
+            <pre>
+              <code class="hljs javascript">@Get()
+async getPost(@Cookies() cookies) {
+  return this.postsService.createPost(post);
+}
+              </code>
+            </pre>
+          </section>
         </section>
 
 
@@ -657,18 +679,30 @@ bootstrap();</code>
           </section>
           <section>
             <pre class="stretch">
-              <code class="hljs javascript" data-line-numbers="0">import {
+              <code class="hljs javascript" data-line-numbers="0|11-12|15-33|13,16-19,21-23">import {
   Injectable,
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 
 import { UserEntity } from 'src/models/users/entities';
 
 @Injectable()
 export class EmailConfirmationGuard implements CanActivate {
+  constructor(private readonly reflector: Reflector) {}
+
   canActivate(context: ExecutionContext) {
+    const isPublic = this.reflector.getAllAndOverride(PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (isPublic) {
+      return true
+    };
+
     const request = context.switchToHttp().getRequest();
     const user: UserEntity = request.user;
 
@@ -677,6 +711,82 @@ export class EmailConfirmationGuard implements CanActivate {
     }
 
     return true;
+  }
+}
+</code>
+              </pre>
+          </section>
+          <section>
+            <pre>
+              <code class="hljs javascript fragment">@Controller('posts')
+@Post()
+@UseGuards(EmailConfirmationGuard)
+async create(@Body() createPostDto: CreatePostDto) {
+  this.postService.create(createPostDto)
+}
+</code>
+              </pre>
+            <pre>
+              <code class="hljs javascript fragment">@Controller('posts')
+@UseGuards(EmailConfirmationGuard)
+export class PostController {}
+</code>
+              </pre>
+            <pre>
+              <code class="hljs javascript fragment">async function bootstrap() {
+  const app = await NestFactory.create(ApplicationModule);
+  app.useGlobalGuard(EmailConfirmationGuard)
+  await app.listen(3000);
+}
+</code>
+              </pre>
+          </section>
+          <section>
+            <h5>Custom metadata decorator</h5>
+            <pre>
+              <code class="hljs javascript">import { SetMetadata } from '@nestjs/common';
+
+export const PUBLIC_KEY = 'isPublic';
+
+export const Public = () => SetMetadata(PUBLIC_KEY, true);
+</code>
+              </pre>
+               <pre>
+              <code class="hljs javascript">@Get()
+@Public()
+async getPost() {
+  return this.postsService.createPost(post);
+}
+              </code>
+            </pre>
+          </section>
+        </section>
+
+
+
+        <section>
+          <section><h1>Interceptors</h1></section>
+          <section class="stretch">
+            <img src="/assets/interceptors_flow.png" alt="" class="stretch">
+          </section>
+          <section>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0|5-6|7|12-16|14-16">import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common'
+import { Observable } from 'rxjs'
+import { tap } from 'rxjs/operators'
+
+@Injectable()
+export class LoggingInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable {
+    console.log('Before...')
+
+    const now = Date.now()
+
+    return next
+      .handle()
+      .pipe(
+        tap(() => console.log(`After... ${Date.now() - now} мс`))
+      )
   }
 }
 </code>
