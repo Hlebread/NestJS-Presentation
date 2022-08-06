@@ -792,6 +792,45 @@ export class LoggingInterceptor implements NestInterceptor {
 </code>
               </pre>
           </section>
+          <section>
+            <pre>
+              <code class="hljs javascript fragment">@Controller('posts')
+@Post()
+@UseInterceptors(LoggingInterceptor)
+async create(@Body() createPostDto: CreatePostDto) {
+  this.postService.create(createPostDto)
+}
+</code>
+              </pre>
+            <pre>
+              <code class="hljs javascript fragment">@Controller('posts')
+@UseInterceptors(LoggingInterceptor)
+export class PostController {}
+</code>
+              </pre>
+            <pre>
+              <code class="hljs javascript fragment">async function bootstrap() {
+  const app = await NestFactory.create(ApplicationModule);
+  app.useGlobalInterceptor(LoggingInterceptor)
+  await app.listen(3000);
+}
+</code>
+              </pre>
+          </section>
+        </section>
+
+
+
+        <section class="stretch">
+          <h1 style="color:#EB2744">NestJS flow</h1>
+          <img src="/assets/nest_flow.png" alt="" class="stretch" style="width: 1920px">
+        </section>
+
+
+
+        <section>
+          <section><h1>Microservices</h1></section>
+
         </section>
 			</div>
 		</div>
