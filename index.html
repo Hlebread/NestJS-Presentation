@@ -248,7 +248,7 @@ export class UserModule {}
           <section style="font-size: 24px;">
             <h1 style="color:#EB2744">NestJS</h1>
             <pre class="stretch">
-              <code class="hljs javascript" data-line-numbers="0|1|6|2,8-10|12,17,22,28,33|18|24|23">import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
+              <code class="hljs javascript" data-line-numbers="0|1|6|2,8-10|12,17,22,28,34|18|24|23|29">import { Body, Controller, Delete, Get, Header, HttpCode, Param, Post, Put } from '@nestjs/common';
 import PostsService from './posts.service';
 import CreatePostDto from './dto/createPost.dto';
 import UpdatePostDto from './dto/updatePost.dto';
@@ -276,6 +276,7 @@ export default class PostsController {
   }
 
   @Put(':id')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   async replacePost(@Param('id') id: string, @Body() post: UpdatePostDto) {
     return this.postsService.replacePost(Number(id), post);
   }
@@ -453,6 +454,8 @@ export class AppConfigService {
           </section>
         </section>
 
+
+
         <section>
           <h1>Exception Filters</h1>
           <section>
@@ -466,22 +469,218 @@ export class AppConfigService {
           </section>
           <section>
             <pre>
-            <code class="hljs javascript">throw new BadRequestException('Wrong credentials provided');</code>
+            <code class="hljs javascript fragment fade-out" data-fragment-index="1">throw new BadRequestException('Wrong credentials provided');</code>
             </pre>
             <pre>
-            <code class="hljs javascript">throw new UnauthorizedException();</code>
+            <code class="hljs javascript fragment fade-out" data-fragment-index="1">throw new UnauthorizedException();</code>
             </pre>
             <pre>
-            <code class="hljs javascript">throw new ForbiddenException();</code>
+            <code class="hljs javascript fragment fade-out" data-fragment-index="1">throw new ForbiddenException();</code>
             </pre>
             <pre>
-            <code class="hljs javascript">throw new ForbiddenException();</code>
+            <code class="hljs javascript fragment fade-out" data-fragment-index="1">throw new ForbiddenException();</code>
             </pre>
             <pre>
-            <code class="hljs javascript">throw new HttpException('Some message', HttpStatus.BAD_REQUEST);
+            <code class="hljs javascript" data-fragment-index="1">throw new HttpException('Some message', HttpStatus.BAD_REQUEST);
 
 throw new BadRequestException('Some message');</code>
             </pre>
+          </section>
+        </section>
+
+
+
+        <section>
+          <section><h1>Pipes</h1></section>
+          <section>
+            <h6>Конвейеры используются для</h6>
+            <ul>
+              <li>
+                трансформации
+              </li>
+              <li>
+                валидации
+              </li>
+            </ul>
+          </section>
+          <section>
+            <h6>Встроенные конвейеры</h6>
+            <ul>
+              <li>
+                ValidationPipe
+              </li>
+              <li>
+                ParseIntPipe
+              </li>
+              <li>
+                ParseFloatPipe
+              </li>
+              <li>
+                ParseBoolPipe
+              </li>
+              <li>
+                ParseArrayPipe
+              </li>
+              <li>
+                ParseUUIDPipe
+              </li>
+              <li>
+                ParseEnumPipe
+              </li>
+              <li>
+                DefaultValuePipe
+              </li>
+            </ul>
+          </section>
+          <section>
+            <pre>
+              <code class="hljs javascript" data-line-numbers="2">@Get(':id')
+async getPostById(@Param('id', ParseIntPipe) id: number) {
+  return this.postService.getPostById(id)
+}</code>
+              </pre>
+            <pre>
+              <code class="hljs javascript fragment fade-in" data-fragment-index="1">// http://localhost:3000/abc
+
+{
+  "statusCode": 400,
+  "message": "Validation failed (numeric string is expected)",
+  "error": "Bad Request"
+}</code>
+              </pre>
+          </section>
+          <section>
+            <h3>Кастомный Pipe валидации</h3>
+            <pre class="stretch">
+              <code class="hljs javascript">import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common'
+import { ObjectSchema } from 'joi'
+
+@Injectable()
+export class JoiValidationPipe implements PipeTransform {
+  constructor(private schema: ObjectSchema) {}
+
+  transform(value: any, metadata: ArgumentMetadata) {
+    const { error } = this.schema.validate(value)
+
+    if (error) {
+      throw new BadRequestException('Валидация провалилась')
+    }
+
+    return value
+  }</code>
+              </pre>
+          </section>
+        </section>
+
+
+
+        <section>
+          <section><h1>Middlewares</h1></section>
+          <section class="stretch">
+            <img src="/assets/middleware_flow.png" alt="" class="stretch">
+          </section>
+          <section>
+            <h3>Кастомный Middleware</h3>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0|5|6-9">import { Injectable, NestMiddleware } from '@nestjs/common'
+import { Request, Response, NextFunction } from 'express'
+
+@Injectable()
+export class LoggerMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    console.log('Запрос...')
+    next()
+  }
+}</code>
+              </pre>
+          </section>
+          <section>
+            <h3>Кастомный Middleware-функция</h3>
+            <pre class="stretch">
+              <code class="hljs javascript">import { Request, Response, NextFunction } from 'express'
+
+export function logger(req: Request, res: Response, next: NextFunction) {
+  console.log('Запрос...')
+  next()
+}
+</code>
+              </pre>
+          </section>
+          <section>
+            <h3>Регистрация посредников</h3>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0|8|9|11|17|12-16">import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common'
+import { LoggerMiddleware } from './middlewares/logger.middleware'
+import { PostModule } from './post/post.module'
+
+@Module({
+  imports: [PostModule]
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .exclude(
+        { path: 'post', method: RequestMethod.GET },
+        { path: 'post', method: RequestMethod.POST },
+        'post/(.*)',
+      )
+      .forRoutes(CatsController)
+  }
+}</code>
+              </pre>
+          </section>
+          <section>
+            <h3>Регистрация глобального посредника</h3>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="7">import { NestFactory } from '@nestjs/core';
+import { ApplicationModule } from './modules/app.module';
+import { logger } from "./middlewares/logger.middleware";
+
+async function bootstrap() {
+  const app = await NestFactory.create(ApplicationModule);
+  app.use(logger)
+  await app.listen(3000);
+}
+
+bootstrap();</code>
+              </pre>
+          </section>
+        </section>
+
+
+
+        <section>
+          <section><h1>Guards</h1></section>
+          <section class="stretch">
+            <img src="/assets/guard_flow.png" alt="" class="stretch">
+          </section>
+          <section>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0">import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
+
+import { UserEntity } from 'src/models/users/entities';
+
+@Injectable()
+export class EmailConfirmationGuard implements CanActivate {
+  canActivate(context: ExecutionContext) {
+    const request = context.switchToHttp().getRequest();
+    const user: UserEntity = request.user;
+
+    if (!user.emailVerified) {
+      throw new UnauthorizedException('Confirm your email first');
+    }
+
+    return true;
+  }
+}
+</code>
+              </pre>
           </section>
         </section>
 			</div>
