@@ -823,14 +823,63 @@ export class PostController {}
 
         <section class="stretch">
           <h1 style="color:#EB2744">NestJS flow</h1>
-          <img src="/assets/nest_flow.png" alt="" class="stretch" style="width: 1920px">
+          <img src="/assets/nest_flow.png" alt="" class="stretch">
         </section>
 
 
 
         <section>
           <section><h1>Microservices</h1></section>
+          <section class="stretch">
+            <img src="/assets/nest_microservices.png" alt="" class="stretch">
+          </section>
+          <section>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0|5-6|7|12-16|14-16">import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { Transport } from '@nestjs/microservices';
 
+async function bootstrap() {
+  const app = await NestFactory.createMicroservice(
+    AppModule,
+    {
+      transport: Transport.TCP,
+    },
+  );
+
+  await app.listen();
+}
+
+bootstrap();
+</code>
+              </pre>
+          </section>
+          <section>
+            <pre class="stretch">
+              <code class="hljs javascript" data-line-numbers="0|5-6|7|12-16|14-16">import { Controller } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
+import CreateSubscriberDto from './dto/createSubscriber.dto';
+import { SubscribersService } from './subscribers.service';
+
+@Controller('subscribers')
+export class SubscribersController {
+  constructor(
+    private readonly subscribersService: SubscribersService,
+  ) {}
+
+  @MessagePattern({ cmd: 'add-subscriber' })
+  addSubscriber(subscriber: CreateSubscriberDto) {
+    return this.subscribersService.addSubscriber(subscriber);
+  }
+
+  @MessagePattern({ cmd: 'get-all-subscribers' })
+  getAllSubscribers() {
+    return this.subscribersService.getAllSubscribers();
+  }
+}
+</code>
+              </pre>
+          </section>
         </section>
 			</div>
 		</div>
