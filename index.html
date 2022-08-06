@@ -37,20 +37,26 @@
 
 
         <section>
-          <section data-background-image="/assets/state_of_js_satisfaction.png"></section>
-          <section data-background-image="/assets/state_of_js_interest.png"></section>
-          <section data-background-image="/assets/state_of_js_usage.png"></section>
-          <section>
+          <section class="stretch">
+            <img src="/assets/state_of_js_satisfaction.png" alt="" class="stretch">
+          </section>
+          <section class="stretch">
+            <img src="/assets/state_of_js_interest.png" alt="" class="stretch">
+          </section>
+          <section class="stretch">
+            <img src="/assets/state_of_js_usage.png" alt="" class="stretch">
+          </section>
+          <section class="stretch">
             <h1>2019</h1>
-            <img src="/assets/risingstarts_2019.png" alt="">
+            <img src="/assets/risingstarts_2019.png" alt="" class="stretch">
           </section>
           <section>
             <h1>2020</h1>
-            <img src="/assets/risingstarts_2020.png" alt="">
+            <img src="/assets/risingstarts_2020.png" alt="" class="stretch">
           </section>
           <section>
             <h1>2021</h1>
-            <img src="/assets/risingstarts_2021.png" alt="">
+            <img src="/assets/risingstarts_2021.png" alt="" class="stretch">
           </section>
         </section>
 
@@ -112,7 +118,8 @@
           <section>
             <h3 style="color:#EB2744">NestJS</h3>
             <pre class="stretch">
-              <code class="hljs javascript" data-line-numbers="0|1-2|4-7|9">import { NestFactory } from '@nestjs/core';
+              <code class="hljs javascript" data-line-numbers="0|2-3|5-8|10">// src/main.ts
+import { NestFactory } from '@nestjs/core';
 import { ApplicationModule } from './modules/app.module';
 
 async function bootstrap() {
@@ -215,13 +222,15 @@ export default App;
           </section>
           <section>
             <pre class="stretch">
-              <code class="hljs javascript" data-line-numbers="0|1|4-9|6|7|8|10">import { Module } from '@nestjs/common';
+              <code class="hljs javascript" data-line-numbers="0|1,6|2-3,7,8|4,9|10">import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { DatabaseModule } from '../db/database.module';
 
 @Module({
   controllers: [UserController],
   providers: [UserService],
+  imports: [DatabaseModule],
   exports: [UserService],
 })
 export class UserModule {}
@@ -239,7 +248,7 @@ export class UserModule {}
           <section style="font-size: 24px;">
             <h1 style="color:#EB2744">NestJS</h1>
             <pre class="stretch">
-              <code class="hljs javascript" data-line-numbers="0|1|6|8-10|12,17,22,27,32|18|23">import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+              <code class="hljs javascript" data-line-numbers="0|1|6|2,8-10|12,17,22,28,33|18|24|23">import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
 import PostsService from './posts.service';
 import CreatePostDto from './dto/createPost.dto';
 import UpdatePostDto from './dto/updatePost.dto';
@@ -261,6 +270,7 @@ export default class PostsController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   async createPost(@Body() post: CreatePostDto) {
     return this.postsService.createPost(post);
   }
@@ -317,7 +327,7 @@ export default class PostsController implements Controller {
   private createPost = (request: Request, response: Response) => {
     const post: CreatePostDto = request.body;
     const createdPost = this.postsService.createPost(post);
-    response.send(createdPost);
+    response.status(200).send(createdPost);
   }
 
   private replacePost = (request: Request, response: Response) => {
@@ -336,17 +346,42 @@ export default class PostsController implements Controller {
               </code>
             </pre>
           </section>
+          <section style="font-size: 24px;">
+            <h1>DTO</h1>
+            <pre>
+              <code class="hljs javascript" data-line-numbers="2">@Post()
+async createPost(@Body() post: CreatePostDto) {
+  return this.postsService.createPost(post);
+}
+              </code>
+            </pre>
+            <pre>
+              <code class="hljs javascript" data-line-numbers="0|1,4-5,8-9">import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+
+export class CreatePostDto {
+  @IsString({ message: 'Title should be a string' })
+  @IsNotEmpty({ message: 'Specify a title' })
+  title: string;
+
+  @IsString({ message: 'Content should be a string' })
+  @MaxLength(200, { message: 'Post length exceeded' })
+  content: string;
+}
+
+              </code>
+            </pre>
+          </section>
           <section>
             <h2>Decorators</h2>
             <ul>
-              <li>@Request(), @Req()</li>
-              <li>@Response(), @Res()</li>
+              <li class="fragment highlight-current-green" data-fragment-index="3">@Request(), @Req()</li>
+              <li class="fragment highlight-current-green" data-fragment-index="3">@Response(), @Res()</li>
               <li>@Session()</li>
               <li>@Param(param?: string)</li>
               <li>@Body(param?: string)</li>
-              <li>@Query(param?: string)</li>
+              <li class="fragment highlight-current-green" data-fragment-index="1">@Query(param?: string)</li>
               <li>@Headers(param?: string)</li>
-              <li>@Ip()</li>
+              <li class="fragment highlight-current-green" data-fragment-index="2">@Ip()</li>
             </ul>
           </section>
         </section>
@@ -358,7 +393,7 @@ export default class PostsController implements Controller {
           <section style="font-size: 24px;">
             <h1>Service</h1>
             <pre class="stretch">
-              <code class="hljs javascript" data-line-numbers="0|7,9-12|14-20,22-26">import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+              <code class="hljs javascript" data-line-numbers="0|7,9-12|14-20,22-26|19">import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import User from './user.entity';
@@ -391,7 +426,7 @@ export class UsersService {
           <section style="font-size: 24px;">
             <h1>Config Service</h1>
             <pre class="stretch">
-              <code class="hljs javascript" data-line-numbers="0|7,9-12|14-20,22-26">import { ConfigService, Injectable } from '@nestjs/common';
+              <code class="hljs javascript" data-line-numbers="0|5|7-21">import { ConfigService, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppConfigService {
@@ -401,8 +436,8 @@ export class AppConfigService {
     return this.configService.get('DATABASE_HOST')
   }
 
-  get DB_PORT(): string {
-    return this.configService.get('DATABASE_PORT')
+  get DB_PORT(): number {
+    return Number(this.configService.get('DATABASE_PORT'));
   }
 
   get DB_NAME(): string {
@@ -414,6 +449,38 @@ export class AppConfigService {
   }
 }
               </code>
+            </pre>
+          </section>
+        </section>
+
+        <section>
+          <h1>Exception Filters</h1>
+          <section>
+            <pre>
+              <code class="hljs javascript">{
+  "statusCode": 500,
+  "message": "Internal server error"
+}
+              </code>
+            </pre>
+          </section>
+          <section>
+            <pre>
+            <code class="hljs javascript">throw new BadRequestException('Wrong credentials provided');</code>
+            </pre>
+            <pre>
+            <code class="hljs javascript">throw new UnauthorizedException();</code>
+            </pre>
+            <pre>
+            <code class="hljs javascript">throw new ForbiddenException();</code>
+            </pre>
+            <pre>
+            <code class="hljs javascript">throw new ForbiddenException();</code>
+            </pre>
+            <pre>
+            <code class="hljs javascript">throw new HttpException('Some message', HttpStatus.BAD_REQUEST);
+
+throw new BadRequestException('Some message');</code>
             </pre>
           </section>
         </section>
