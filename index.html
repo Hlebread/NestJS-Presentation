@@ -85,7 +85,7 @@
 
 
         <section>
-          <section data-background-image="./assets/nest_title_page.png"></section>
+          <section data-background-image="./assets/nest_title_page.png" data-background-size="100% 100%"></section>
           <section>
             <ul>
               <li class="fragment">CLI</li>
@@ -115,9 +115,9 @@
             </h1>
             <img src="./assets/witch.gif" alt="">
           </section>
-          <section>
-            <h3 style="color:#EB2744">NestJS</h3>
-            <pre class="stretch">
+          <section style="font-size: 35px;">
+            <h6 style="color:#EB2744">NestJS</h6>
+            <pre>
               <code class="hljs javascript" data-line-numbers="0|2-3|5-8|10">// src/main.ts
 import { NestFactory } from '@nestjs/core';
 import { ApplicationModule } from './modules/app.module';
@@ -130,10 +130,8 @@ async function bootstrap() {
 bootstrap();
                 </code>
               </pre>
-          </section>
-          <section>
-            <h3>Express</h3>
-            <pre class="stretch">
+            <h6>Express</h6>
+            <pre>
               <code class="hljs javascript">import * as express from 'express';
 
 const app = express();
@@ -239,6 +237,12 @@ export class UserModule {}
           </section>
         </section>
 
+
+
+        <section class="stretch">
+          <h1 style="color:#EB2744">NestJS flow</h1>
+          <img src="./assets/nest_flow.png" alt="" class="stretch">
+        </section>
 
 
         <section>
@@ -821,13 +825,6 @@ export class PostController {}
 
 
 
-        <section class="stretch">
-          <h1 style="color:#EB2744">NestJS flow</h1>
-          <img src="./assets/nest_flow.png" alt="" class="stretch">
-        </section>
-
-
-
         <section>
           <section><h1>Microservices</h1></section>
           <section class="stretch">
@@ -880,6 +877,12 @@ export class SubscribersController {
 </code>
               </pre>
           </section>
+        </section>
+
+
+
+        <section>
+          <img src="./assets/conslusion.png" alt="" width="100%">
         </section>
 			</div>
 		</div>
